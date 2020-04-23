@@ -120,7 +120,6 @@ class Game:
         cities += [City((random.randint(25, 100), random.randint(25, 75)))]
         cities[4].infection = 20
         cities[3].infection = 100
-        print(cities)
         mapButtons = [GameButton(SpriteSheet(self.getImage(self.TYPE_FG, "back.png")).cut(10, 10), (6, 80, 10, 10), self.scale, self.offset)]
         mapButtons[0].function = self.toggleMap
         self.map = Map(self.getImage(self.TYPE_FG, "worldmap.png"), cities, mapButtons, [])
