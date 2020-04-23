@@ -2,6 +2,7 @@
 
 class GameObject:
     def __init__(self, animationFrames, pos, timer):
+        self.show = True
         self.animationFrames = animationFrames
         self.frameNumber = 0
         self.frameTimer = 0
