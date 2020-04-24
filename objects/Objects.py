@@ -41,7 +41,7 @@ class UIElement(GameObject):
         super(UIElement, self).__init__(frames, pos, 0)
 
     def updateSelf(self, data):
-        self.frameNumber = data // 10
+        self.frameNumber = int(data // 10)
 
 
 class Paper(GameObject):
@@ -81,26 +81,59 @@ class Bill:
         self.effects = effects
         letters = []
         self.lines = []
-        i = 0
-        for char in message.lower():
-            if char == " ":
-                letters += [alphabet[26]]
-            elif char == ",":
-                letters += [alphabet[27]]
-            elif char == ".":
-                letters += [alphabet[28]]
-            elif char == "!":
-                letters += [alphabet[29]]
+        self.words = message.split(" ")
+        count = 0
+        line = []
+        lines = []
+        for word in self.words:
+            count += len(word) + 1
+            if count > 19:
+                count = len(word)
+                lines += [line]
+                line = [word]
             else:
-                letters += [alphabet[string.ascii_lowercase.index(char)]]
-            i += 1
-            if i >= 19:
-                i = 0
-                self.lines += [letters]
-                letters = []
+                line += [word]
+        lines += [line]
+        for line in lines:
+            for word in line:
+                for char in word.lower():
+                    if char == ",":
+                        letters += [alphabet[27]]
+                    elif char == ".":
+                        letters += [alphabet[28]]
+                    elif char == "!":
+                        letters += [alphabet[29]]
+                    else:
+                        letters += [alphabet[string.ascii_lowercase.index(char)]]
+                letters += [alphabet[26]]
+            self.lines += [letters]
+            letters = []
         self.lines += [letters]
 
     def draw(self, display):
         for i in range(len(self.lines)):
             for j in range(len(self.lines[i])):
                 display.blit(self.lines[i][j], (6 + (j * 6), 6 + (i * 7)))
+
+
+class Curtain(GameObject):
+    def __init__(self, frames, pos):
+        super(Curtain, self).__init__(frames, pos, 10)
+        self.start = False
+
+    def update(self):
+        if self.start:
+            self.frameTimer += 1
+            if self.frameTimer >= self.timer:
+                if self.animationFrames[self.frameNumber] == self.animationFrames[-1]:
+                    self.frameNumber = 0
+                    self.show = False
+                    self.start = False
+                self.frameTimer = 0
+                self.updateAnimation()
+                if self.animationFrames[self.frameNumber] == self.animationFrames[-1]:
+                    self.done()
+
+    def done(self):
+        pass
+
