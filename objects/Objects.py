@@ -1,5 +1,7 @@
+import pygame
+import string
+
 from objects.GameObject import *
-import pygame, string
 
 
 class Candle(GameObject):
@@ -136,4 +138,3 @@ class Curtain(GameObject):
 
     def done(self):
         pass
-

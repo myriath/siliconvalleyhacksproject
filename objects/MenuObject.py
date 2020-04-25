@@ -1,7 +1,8 @@
+import random
+
 import pygame
 
 from engine.SpriteSheet import SpriteSheet
-import random
 
 
 class Menu:
@@ -126,9 +127,9 @@ class City(GameButton):
 
     def updateInfection(self, rate):
         if self.quarantined:
-            self.infection += random.randint(1, int(rate//4))
+            self.infection += random.randint(rate - 12, int(rate // 4))
         else:
-            self.infection += random.randint(1, rate)
+            self.infection += random.randint(rate - 12, rate)
         from engine.Engine import cap
         self.infection = cap(0, 100, self.infection)
 
@@ -151,6 +152,34 @@ class City(GameButton):
             display.blit(self.frames[1], (self.dim[0], self.dim[1]))
         else:
             display.blit(self.frames[0], (self.dim[0], self.dim[1]))
+
         from engine.Engine import cap
-        if cap(0, 8, abs(self.infection // 8)) > 0:
-            pygame.draw.rect(display, (200, 0, 0), (self.dim[0] + 1, self.dim[1] + 1, cap(0, 8, abs(self.infection // 8)), 1))
+        if cap(0, 8, self.infection // 12.5) > 0:
+            pygame.draw.rect(display, (200, 0, 0),
+                             (self.dim[0] + 1, self.dim[1] + 1, cap(0, 8, self.infection // 12.5), 1))
+
+
+class MuteButton(GameButton):
+    def __init__(self, frames, dim, scale, offset, sound):
+        super().__init__(frames, dim, scale, offset, sound)
+        self.muted = False
+
+    def checkClicked(self, pos):
+        x, y = pos
+        dim = (
+            self.dim[0] * self.scale + self.offset[0], self.dim[1] * self.scale + self.offset[1],
+            self.dim[2] * self.scale,
+            self.dim[3] * self.scale)
+
+        if dim[0] < x < dim[0] + dim[2]:
+            if dim[1] < y < dim[1] + dim[3]:
+                self.frameNumber = 1
+                self.timer = 30
+                self.sound.play()
+                self.muted = not self.muted
+
+    def draw(self, display):
+        if self.muted:
+            display.blit(self.frames[1], (self.dim[0], self.dim[1]))
+        else:
+            display.blit(self.frames[0], (self.dim[0], self.dim[1]))

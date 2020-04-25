@@ -1,8 +1,10 @@
-import sys, os
-from objects.Background import *
-from objects.Objects import *
-from objects.MenuObject import *
+import os
+import sys
+
 from engine.SpriteSheet import *
+from objects.Background import *
+from objects.MenuObject import *
+from objects.Objects import *
 
 TYPE_BG = 0
 TYPE_FG = 1
@@ -13,13 +15,17 @@ COND_ECONOMY = 1
 COND_INFECTION = 2
 COND_TIME = 3
 
+VOLUME_FULL = 0.05
+VOLUME_MUTE = 0
+VOLUME = VOLUME_FULL
+
 
 def cap(low, high, value):
     return min(high, max(value, low))
 
 
 def playSound(filename, loops=-1, fadeout=True):
-    pygame.mixer.music.set_volume(0.05)
+    pygame.mixer.music.set_volume(VOLUME)
     if fadeout:
         pygame.mixer.music.fadeout(1)
     pygame.mixer.music.load(os.path.join(os.getcwd(), "assets", "sounds", filename))
@@ -59,6 +65,7 @@ class Game:
         self.display = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
         self.window = (self.display.get_width(), self.display.get_height())
         pygame.display.set_icon(getImage(TYPE_SP, "icon.ico"))
+        pygame.display.set_caption("Systemic Pandemic")
         self.clock = pygame.time.Clock()
         self.quit = False
         self.pause = False
@@ -161,6 +168,10 @@ class Game:
             GameButton(SpriteSheet(getImage(TYPE_FG, "quit.png")).cut(27, 10), (95, 80, 27, 10), self.scale,
                        self.offset, self.clickSound),
             GameButton(SpriteSheet(getImage(TYPE_FG, "back.png")).cut(10, 10), (6, 6, 10, 10), self.scale,
+                       self.offset, self.clickSound),
+            MuteButton(SpriteSheet(getImage(TYPE_FG, "sound.png")).cut(10, 10), (22, 6, 10, 10), self.scale,
+                       self.offset, self.clickSound),
+            MuteButton(SpriteSheet(getImage(TYPE_FG, "musicmute.png")).cut(10, 10), (38, 6, 10, 10), self.scale,
                        self.offset, self.clickSound)]
         pauseButtons[0].function = self.stop
         pauseButtons[1].function = self.pauseGame
@@ -195,24 +206,24 @@ class Game:
         self.loop()
 
     def restart(self):
-        print("restart")
-        self.infectionRate = 20
+        self.infectionRate = 10
         self.economy = 50
         self.opinion = 50
-        self.infection = 10
+        self.infection = 30
         self.winSplash.show = False
         self.loseEconomy.show = False
         self.loseOpinion.show = False
         self.loseInfection.show = False
         self.loseTime.show = False
         self.generateBills()
-        self.bill = random.choice(self.bills)
+        self.bill = self.bills[0]
         self.gameover = False
         self.cities = []
         for i in range(4):
             self.cities += [self.generateCities()]
-        self.cities[3].infection = 20
-        self.cities[2].infection = 20
+        self.cities[3].infection = 40
+        self.cities[2].infection = 40
+        self.cities[1].infection = 40
         mapButtons = [
             GameButton(SpriteSheet(getImage(TYPE_FG, "back.png")).cut(10, 10), (6, 80, 10, 10), self.scale, self.offset,
                        self.clickSound)]
@@ -221,6 +232,8 @@ class Game:
 
         self.counter = DayCounter([getImage(TYPE_FG, "counter.png")], (102, 6),
                                   SpriteSheet(getImage(TYPE_FG, "daynumbers.png")).cut(5, 6))
+
+        self.readConfig()
 
         self.time = self.TIME_DAY
         playSound("day.mp3")
@@ -245,7 +258,9 @@ class Game:
             return self.generateCities()
 
     def generateBills(self):
-        self.bills += [Bill("Declare state of Emergency", self.alphabet, (-3, -3, -3, 3, 3, 5))]
+        self.bills = []
+        self.bills += [
+            Bill("Declare state of Emergency due to a new virus named covid.", self.alphabet, (-3, -3, -3, 3, 3, 5))]
         self.bills += [Bill(
             "Give a grand to every citizen over the age of eighteen and who are NOT claimed as dependent based on their previous taxes.",
             self.alphabet, (3, 3, 0, -3, -3, 0))]
@@ -379,21 +394,23 @@ class Game:
                 self.days += 1
             effects = self.bill.effects
             if self.choice == self.CHOICE_YES:
-                self.economy += effects[0]
-                self.opinion += effects[1]
+                self.economy += effects[0] * 3
+                self.opinion += effects[1] * 3
                 self.infectionRate += effects[2]
             elif self.choice == self.CHOICE_NO:
-                self.economy += effects[3]
-                self.opinion += effects[4]
+                self.economy += effects[3] * 3
+                self.opinion += effects[4] * 3
                 self.infectionRate += effects[5]
             self.choice = self.CHOICE_NULL
             self.bills.remove(self.bill)
             self.bill = random.choice(self.bills)
+            print(len(self.bills))
             totalInfection = 0
             for city in self.map.cities:
+                city.updateInfection(self.infectionRate)
                 totalInfection += city.infection
                 if city.quarantined:
-                    self.economy -= 1
+                    self.economy -= 5
                     self.opinion -= 5
             self.infection = (totalInfection/(100 * len(self.map.cities))) * 100
 
@@ -403,6 +420,8 @@ class Game:
 
             if self.infection == 0:
                 self.win(COND_INFECTION)
+            elif self.infection == 100:
+                self.lose(COND_INFECTION)
             elif self.opinion == 0:
                 self.lose(COND_OPINION)
             elif self.economy == 0:
@@ -419,13 +438,14 @@ class Game:
                     playSound("night.mp3")
                 self.curtainsOpen.start = True
                 self.curtainsOpen.show = True
-            print(self.days)
+            print(self.economy, self.opinion, self.infection, self.infectionRate)
 
     def win(self, condition):
         if condition == COND_TIME:
             self.winSplash.show = True
         elif condition == COND_INFECTION:
             self.winSplash.show = True
+            self.writeFile(2, True)
         self.gameover = True
         self.winSound.play()
 
@@ -506,6 +526,20 @@ class Game:
                             self.clicked = []
 
     def update(self):
+        if self.pauseMenu.buttons[2].muted:
+            self.clickSound.set_volume(VOLUME_MUTE)
+            self.winSound.set_volume(VOLUME_MUTE)
+            self.loseSound.set_volume(VOLUME_MUTE)
+        else:
+            self.clickSound.set_volume(VOLUME_FULL)
+            self.winSound.set_volume(VOLUME_FULL)
+            self.loseSound.set_volume(VOLUME_FULL)
+
+        if self.pauseMenu.buttons[3].muted:
+            pygame.mixer.music.set_volume(VOLUME_MUTE)
+        else:
+            pygame.mixer.music.set_volume(VOLUME_FULL)
+
         if not (self.pause or self.gameover):
             for obj in self.objects:
                 obj.update()
@@ -545,6 +579,18 @@ class Game:
 
             self.curtainsOpen.update()
             self.curtainsClose.update()
+
+            self.paper.frameNumber = self.choice
+
+            if self.choice == self.CHOICE_YES:
+                self.buttons[3].frameNumber = 1
+                self.buttons[4].frameNumber = 0
+            elif self.choice == self.CHOICE_NO:
+                self.buttons[3].frameNumber = 0
+                self.buttons[4].frameNumber = 1
+            else:
+                self.buttons[3].frameNumber = 0
+                self.buttons[4].frameNumber = 0
         else:
             if self.firstrun:
                 self.clicktostart.update()
@@ -564,8 +610,6 @@ class Game:
 
             if self.winSplash.show:
                 self.winSplash.update()
-
-            self.paper.frameNumber = self.choice
 
     def draw(self):
         self.display.fill(self.black)

@@ -1,0 +1,2 @@
+pyinstaller -y -w -i "C:/Users/mitch/PycharmProjects/siliconvalleyhacksproject/assets/sprites/icon.ico" --add-data "C:/Users/mitch/PycharmProjects/siliconvalleyhacksproject/assets";"assets/" --add-data "C:/Users/mitch/PycharmProjects/siliconvalleyhacksproject/engine";"engine/" --add-data "C:/Users/mitch/PycharmProjects/siliconvalleyhacksproject/objects";"objects/" --add-data "C:/Users/mitch/PycharmProjects/siliconvalleyhacksproject/config.conf";"." -n SystemicPandemic  "C:/Users/mitch/PycharmProjects/siliconvalleyhacksproject/main.py"
+pause
