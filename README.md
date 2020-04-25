@@ -31,3 +31,6 @@ Each day/night you are given a new bill to either pass or veto. You can also cho
 ## Bill Screen
 * This screen shows you the bill on your desk. Each day you need to read this and make a decision about whether or not to pass the bill.
 * ![backbill](/assets/github/back.png) - Click this button to close the bill screen
+
+## Achievements
+There are 3 secret achievements you can get by playing the game really well. Good luck finding them! :)
