@@ -78,7 +78,7 @@ class Game:
         self.choice = self.CHOICE_NULL
         self.days = 1
 
-        playSound("day.mp3")
+        playSound("title.mp3")
         self.winSound = getSound("win.wav")
         self.winSound.set_volume(0.05)
         self.loseSound = getSound("lose.wav")
