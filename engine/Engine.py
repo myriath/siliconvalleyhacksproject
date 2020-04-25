@@ -1,7 +1,6 @@
 import os
 import sys
 
-from engine.SpriteSheet import *
 from objects.Background import *
 from objects.MenuObject import *
 from objects.Objects import *
@@ -178,13 +177,13 @@ class Game:
         pauseLabels = []
         self.pauseMenu = Menu(menubg, pauseButtons, pauseLabels)
 
-        billbg = getImage(TYPE_BG, "billbackground.png")
+        billbg = getImage(TYPE_BG, "billbackground2.png")
         billButtons = [
             GameButton(SpriteSheet(getImage(TYPE_FG, "back.png")).cut(10, 10), (6, 80, 10, 10), self.scale,
                        self.offset, self.clickSound)]
         billButtons[0].function = self.toggleBill
         billLabels = []
-        self.billMenu = Menu(billbg, billButtons, billLabels)
+        self.billMenu = BillMenu(billbg, billButtons, billLabels, (0, 0))
 
         self.cities = []
         for i in range(4):
@@ -258,77 +257,82 @@ class Game:
             return self.generateCities()
 
     def generateBills(self):
-        self.bills = []
-        self.bills += [
-            Bill("Declare state of Emergency due to a new virus named covid.", self.alphabet, (-3, -3, -3, 3, 3, 5))]
-        self.bills += [Bill(
-            "Give a grand to every citizen over the age of eighteen and who are NOT claimed as dependent based on their previous taxes.",
-            self.alphabet, (3, 3, 0, -3, -3, 0))]
-        self.bills += [Bill("Shut down all non essential businesses for two months to prevent the spread of the virus.",
-                            self.alphabet, (-5, -3, -3, 3, 3, 3))]
-        self.bills += [Bill("Issue a shelter in place order. ", self.alphabet, (-3, -3, -3, 3, 3, 3))]
-        self.bills += [Bill("Issue a curfew of seven PM across the nation. ", self.alphabet, (-3, -3, -3, 3, 3, 3))]
-        self.bills += [Bill("Allow the police go into civilian housing with a warrant if suspected to have Covid.",
-                            self.alphabet, (0, -5, -1, 0, 5, 1))]
-        self.bills += [Bill(
-            "Instate a Universal Basic Income of two and a half thousand to every citizen for six months on a renewable basis of every six months until Covid subsides.",
-            self.alphabet, (3, 5, 3, -3, -5, -3))]
-        self.bills += [Bill("Buy back most weapons in an effort to reduce the likelihood of a revolt.", self.alphabet,
-                            (0, -3, -3, 0, 3, 3))]
-        self.bills += [Bill("Instate a travel ban on all travel to and from other countries.", self.alphabet,
-                            (-3, -3, -3, 3, 3, 3))]
-        self.bills += [Bill("Place a ban on travel to other states for one month.", self.alphabet, (-3, -3, -1, 3, 3, 1))]
-        self.bills += [Bill(
-            "Citizens will be fined up to two thousand dollars or jailed up to six months for having Covid and not quarantining.",
-            self.alphabet, (-3, -3, -1, 3, 3, 1))]
-        self.bills += [Bill("All businesses must shut down for two weeks effective immediately.", self.alphabet,
-                            (-3, -3, -3, 3, 3, 3))]
-        self.bills += [Bill(
-            "Give businesses a chance to apply for a loan that doesnt need payment for six months and accrue no interest over that time for all businesses that made less than one billion dollars.",
-            self.alphabet, (3, 0, 0, -3, 0, 0))]
-        self.bills += [Bill("Make all treatment and testing of Covid free.", self.alphabet, (3, 3, -3, -3, -3, 3))]
-        self.bills += [Bill("Appropriate money to develop a cure for Covid.", self.alphabet, (1, 3, 3, -3, -3, -3))]
-        self.bills += [
-            Bill("Allocate more money towards making testing more available across the nation.", self.alphabet,
-                 (3, 3, -3, -3, -3, 3))]
-        self.bills += [Bill("Allow illegal immigrants to get care at hospitals without being sent home right after.",
-                            self.alphabet, (0, -3, -3, 0, 3, 3))]
-        self.bills += [Bill("Prohibit immigration for the next sixty days effective immediately.", self.alphabet,
-                            (-1, 0, -1, 3, 0, 3))]
-        self.bills += [
-            Bill("Five G service towers must be taken down out of the fear they may harm civilians.", self.alphabet,
-                 (0, -3, 0, 0, 3, 0))]
-        self.bills += [Bill(
-            "Give orders to hospitals that if there are not enough ventilators at the hospital to prioritize those most likely to survive.",
-            self.alphabet, (0, -5, 0, 0, 5, 0))]
-        self.bills += [
-            Bill("Require most businesses to give all employees a mandatory two weeks paid vacation.", self.alphabet,
-                 (-1, 3, -3, 3, -3, 3))]
-        self.bills += [
-            Bill("Give more money to states to aid in the response to Covid.", self.alphabet, (3, 3, -1, -3, -3, 1))]
-        self.bills += [Bill("Give airlines a twenty five Billion dollar bailout due to losses in the industry.", self.alphabet,
-                            (1, -3, 0, -3, 3, 0))]
-        self.bills += [Bill("Force certain businesses capable of producing ventilators to produce them.", self.alphabet,
-                            (-1, 3, -1, 3, -3, 1))]
-        self.bills += [Bill(
-            "Require school to go to online learning using a platform of their choice, give all students a form of wifi temporarily, and a computer if a student does not have one already.",
-            self.alphabet, (-3, 3, 0, 3, -3, 0))]
-        self.bills += [Bill("Require universities to extend their deadline to accept to June first.", self.alphabet,
-                            (0, 3, -1, 0, -3, 1))]
-        self.bills += [Bill("Prioritize cities that have the most cases of Covid first for testing and ventilators.",
-                            self.alphabet, (-3, -5, -3, 3, 3, 3))]
-        self.bills += [Bill(
-            "Require grocery stores to have designated times where people sixty and over can shop and it must be at least one hour or more.",
-            self.alphabet, (-3, 3, -3, 3, -3, 3))]
-        self.bills += [Bill(
-            "Allow anyone that is healthy and has been tested to work for any fire department to help combat the fires that are happening across the country.",
-            self.alphabet, (3, 3, 3, -3, -3, -3))]
-        self.bills += [Bill(
-            "Require schools to create other means of learning to help elementary and middle school aged students learn.",
-            self.alphabet, (0, 3, 0, 0, -3, 0))]
-        self.bills += [Bill(
-            "Quarantine all large cities until further notice. Only grocery stores will be open and rent does not have to be paid during that time but will be owed after the time has passed.",
-            self.alphabet, (-3, 3, -3, 3, -3, 3))]
+        self.bills = [
+            Bill("Declare state of Emergency due to a new virus named covid.", self.alphabet, (-3, -3, -3, 3, 3, 5)),
+            Bill(
+                "Give a grand to every citizen over the age of eighteen and who are NOT claimed as dependent based on their previous taxes.",
+                self.alphabet, (3, 3, 0, -3, -3, 0)),
+            Bill("Shut down all non essential businesses for two months to prevent the spread of the virus.",
+                 self.alphabet, (-5, -3, -3, 3, 3, 3)),
+            Bill("Issue a shelter in place order. ", self.alphabet, (-3, -3, -3, 3, 3, 3)),
+            Bill("Issue a curfew of seven PM across the nation. ", self.alphabet, (-3, -3, -3, 3, 3, 3)),
+            Bill("Allow the police go into civilian housing with a warrant if suspected to have Covid.",
+                 self.alphabet, (0, -5, -1, 0, 5, 1)),
+            Bill(
+                "Instate a Universal Basic Income of two and a half thousand to every citizen for six months on a renewable basis of every six months until Covid subsides.",
+                self.alphabet, (3, 5, 3, -3, -5, -3)),
+            Bill("Buy back most weapons in an effort to reduce the likelihood of a revolt.", self.alphabet,
+                 (0, -3, -3, 0, 3, 3)),
+            Bill("Instate a travel ban on all travel to and from other countries.", self.alphabet,
+                 (-3, -3, -3, 3, 3, 3)),
+            Bill("Place a ban on travel to other states for one month.", self.alphabet, (-3, -3, -1, 3, 3, 1)),
+            Bill(
+                "Citizens will be fined up to two thousand dollars or jailed up to six months for having Covid and not quarantining.",
+                self.alphabet, (-3, -3, -1, 3, 3, 1)),
+            Bill("All businesses must shut down for two weeks effective immediately.", self.alphabet,
+                 (-3, -3, -3, 3, 3, 3)),
+            Bill(
+                "Give businesses a chance to apply for a loan that doesnt need payment for six months and accrue no interest over that time for all businesses that made less than one billion dollars.",
+                self.alphabet, (3, 0, 0, -3, 0, 0)),
+            Bill("Make all treatment and testing of Covid free.", self.alphabet, (3, 3, -3, -3, -3, 3)),
+            Bill("Appropriate money to develop a cure for Covid.", self.alphabet, (1, 3, 3, -3, -3, -3)),
+            Bill("Allocate more money towards making testing more available across the nation.",
+                 self.alphabet,
+                 (3, 3, -3, -3, -3, 3)),
+            Bill("Allow illegal immigrants to get care at hospitals without being sent home right after.",
+                 self.alphabet, (0, -3, -3, 0, 3, 3)),
+            Bill("Prohibit immigration for the next sixty days effective immediately.", self.alphabet,
+                 (-1, 0, -1, 3, 0, 3)),
+            Bill("Five G service towers must be taken down out of the fear they may harm civilians.",
+                 self.alphabet,
+                 (0, -3, 0, 0, 3, 0)),
+            Bill(
+                "Give orders to hospitals that if there are not enough ventilators at the hospital to prioritize those most likely to survive.",
+                self.alphabet, (0, -5, 0, 0, 5, 0)),
+            Bill("Require most businesses to give all employees a mandatory two weeks paid vacation.",
+                 self.alphabet,
+                 (-1, 3, -3, 3, -3, 3)),
+            Bill("Give more money to states to aid in the response to Covid.", self.alphabet,
+                 (3, 3, -1, -3, -3, 1)),
+            Bill("Give airlines a twenty five Billion dollar bailout due to losses in the industry.",
+                 self.alphabet,
+                 (1, -3, 0, -3, 3, 0)),
+            Bill("Force certain businesses capable of producing ventilators to produce them.", self.alphabet,
+                 (-1, 3, -1, 3, -3, 1)),
+            Bill(
+                "Require school to go to online learning using a platform of their choice, give all students a form of wifi temporarily, and a computer if a student does not have one already.",
+                self.alphabet, (-3, 3, 0, 3, -3, 0)),
+            Bill("Require universities to extend their deadline to accept to June first.", self.alphabet,
+                 (0, 3, -1, 0, -3, 1)),
+            Bill("Prioritize cities that have the most cases of Covid first for testing and ventilators.",
+                 self.alphabet, (-3, -5, -3, 3, 3, 3)),
+            Bill(
+                "Require grocery stores to have designated times where people sixty and over can shop and it must be at least one hour or more.",
+                self.alphabet, (-3, 3, -3, 3, -3, 3)),
+            Bill(
+                "Allow anyone that is healthy and has been tested to work for any fire department to help combat the fires that are happening across the country.",
+                self.alphabet, (3, 3, 3, -3, -3, -3)),
+            Bill(
+                "Require schools to create other means of learning to help elementary and middle school aged students learn.",
+                self.alphabet, (0, 3, 0, 0, -3, 0)),
+            Bill(
+                "Quarantine all large cities until further notice. Only grocery stores will be open and rent does not have to be paid during that time but will be owed after the time has passed.",
+                self.alphabet, (-3, 3, -3, 3, -3, 3))]
+        self.bills[-1].function = self.quarantineRandomCity
+
+    def quarantineRandomCity(self):
+        city = random.choice(self.map.cities)
+        city.quarantined = True
 
     def toggleMap(self):
         self.showingMap = not self.showingMap
@@ -397,6 +401,7 @@ class Game:
                 self.economy += effects[0] * 3
                 self.opinion += effects[1] * 3
                 self.infectionRate += effects[2]
+                self.bill.function()
             elif self.choice == self.CHOICE_NO:
                 self.economy += effects[3] * 3
                 self.opinion += effects[4] * 3
@@ -404,8 +409,9 @@ class Game:
             self.choice = self.CHOICE_NULL
             self.bills.remove(self.bill)
             self.bill = random.choice(self.bills)
-            print(len(self.bills))
             totalInfection = 0
+            if self.infectionRate < 3:
+                self.infectionRate = 3
             for city in self.map.cities:
                 city.updateInfection(self.infectionRate)
                 totalInfection += city.infection

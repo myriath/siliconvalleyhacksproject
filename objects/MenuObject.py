@@ -32,6 +32,31 @@ class Menu:
         self.clicked = []
 
 
+class BillMenu(Menu):
+    def __init__(self, menuBackground, buttons, labels, pos):
+        super().__init__(menuBackground, buttons, labels)
+        self.pos = pos
+
+    def draw(self, display):
+        display.blit(self.menuBackground, self.pos)
+        for button in self.buttons:
+            button.draw(display)
+        for label in self.labels:
+            label.draw(display)
+
+    def click(self, pos):
+        for button in self.buttons:
+            if button.checkClicked(pos):
+                button.frameNumber = 1
+                self.clicked += [button]
+
+    def unclick(self):
+        for button in self.clicked:
+            button.frameNumber = 0
+            button.function()
+        self.clicked = []
+
+
 class Label:
     def __init__(self, image, dim):
         self.image, self.dim = image, dim

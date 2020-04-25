@@ -1,5 +1,6 @@
-import pygame
 import string
+
+import pygame
 
 from objects.GameObject import *
 
@@ -44,6 +45,9 @@ class UIElement(GameObject):
 
     def updateSelf(self, data):
         self.frameNumber = int(data // 10)
+        if self.frameNumber == 0:
+            if data > 0:
+                self.frameNumber = 1
 
 
 class Paper(GameObject):
@@ -111,6 +115,9 @@ class Bill:
             self.lines += [letters]
             letters = []
         self.lines += [letters]
+
+    def function(self):
+        pass
 
     def draw(self, display):
         for i in range(len(self.lines)):
